@@ -53,3 +53,18 @@ ChiroVox recordings are CC BY-NC-ND 4.0: used locally and non-commercially, neve
 **What it means:**
 1. The approach works (74% from tiny data), but reaching field-ready accuracy needs **recordings from many sites and devices**. That's exactly why partners with their own recordings matter, and the strongest argument in the pitch.
 2. Next technical steps: per-site normalisation, more windows per recording, data from Vietnam/Indonesia/Thailand in ChiroVox, and a small fine-tuned model if embeddings plateau.
+
+## Correction: time-expanded files (2026-10-24, later the same day)
+
+**Bug:** 157 of the 237 Malaysian recordings are stored by ChiroVox time-expanded (a 384 kHz recording slowed 16x and saved at 24 kHz; the metadata gives the real rate). Test 2 resampled them as if they were real-time 24 kHz audio, so after the 12 kHz high-pass most of their calls were gone. Checked on a Hipposideros cervinus file: stored peak 7.2 kHz x 16 = 114.9 kHz, its known call frequency.
+
+**Fix:** `prepare_windows.load` uses the recorded sample rate from the manifest when the file rate is below 192 kHz.
+
+**Corrected results** (same split as Test 2):
+
+| Features | Species | Genus | Species, unseen sites | Genus, unseen sites |
+|---|---|---|---|---|
+| Baseline spectrum | 73% | 81% | 45% | 59% |
+| **Perch 2.0, time-expanded 12x** | **81%** | **92%** | **53%** | **84%** |
+
+Site normalisation (subtracting each site's mean embedding) made unseen-site accuracy worse (37% to 26-30% on the buggy run), because sites differ in species mix, so the site mean carries species information. The fix for unseen sites is more sites per species, not normalisation.

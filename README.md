@@ -9,11 +9,13 @@ Most free bat-call AI was trained on European and North American bats. This repo
 | Test | Data | Result |
 |---|---|---|
 | BatDetect2 v1.3.1, off the shelf | 12 Malaysian recordings, 6 genera | 0 of 12 species correct, calls found in 5 of 12 recordings |
-| Spectrum baseline + logistic regression | 237 recordings, 21 Malaysian species | 67% species / 79% genus |
-| **Perch 2.0 embeddings + logistic regression** | same | **74% species / 88% genus** |
-| Perch 2.0, tested only on unseen recording sites | same, grouped by locality | 36% species |
+| Spectrum baseline + logistic regression | 237 recordings, 21 Malaysian species | 73% species / 81% genus |
+| **Perch 2.0 embeddings + logistic regression** | same | **81% species / 92% genus** |
+| Perch 2.0, tested only on unseen recording sites | same, grouped by locality | 53% species / 84% genus |
 
 Scores are per recording (window predictions averaged), with cross-validation grouped by recording so no recording is used for both training and testing. Chance is 5% for species and 14% for genus.
+
+> **Correction, 24 Oct 2026:** 157 of the 237 recordings are stored in ChiroVox time-expanded (slowed 16x, saved at 24 kHz). The first version read them as real-time audio, which filtered most of their calls away. `prepare_windows.py` now uses the library's recorded sample rate. Every score went up; earlier numbers were 74% / 88% / 36%.
 
 **The honest headline:** the method learns 21 species from about ten examples each, but accuracy drops a lot on sites it has never heard. Field use needs recordings from many more sites and devices. Details and caveats are in [FINDINGS.md](FINDINGS.md).
 

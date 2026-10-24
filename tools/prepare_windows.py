@@ -19,9 +19,13 @@ EXPANSION = 12
 WIN = 160_000  # 5 s at 32 kHz after expansion = 0.417 s real time
 
 
-def load(path: Path) -> np.ndarray:
+def load(path: Path, recorded_khz: str = "") -> np.ndarray:
     x, sr = sf.read(path, dtype="float32", always_2d=True)
     x = x[:, 0]
+    # Many ChiroVox files are stored time-expanded (e.g. a 384 kHz recording saved at 24 kHz,
+    # slowed 16x). The library's metadata gives the real recording rate, so use that.
+    if recorded_khz and sr < 192_000 and int(recorded_khz) * 1000 > sr:
+        sr = int(recorded_khz) * 1000
     if sr != SR:
         g = np.gcd(sr, SR)
         x = signal.resample_poly(x, SR // g, sr // g).astype(np.float32)
@@ -59,7 +63,7 @@ def main(country: str = "Malaysia", k: int = 6) -> None:
     X, species, genus, rec = [], [], [], []
     for m in manifest:
         try:
-            wins = call_windows(load(src / m["file"]), k)
+            wins = call_windows(load(src / m["file"], m.get("samplerate_khz", "")), k)
         except Exception as e:  # unreadable or odd files are skipped, not fatal
             print("skip", m["file"], e)
             continue

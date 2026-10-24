@@ -17,10 +17,16 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "chirovox"
 
 
-def get(url: str) -> bytes:
-    req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return r.read()
+def get(url: str, tries: int = 4) -> bytes:
+    for attempt in range(tries):
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return r.read()
+        except OSError:  # timeouts and dropped connections: back off and retry
+            if attempt == tries - 1:
+                raise
+            time.sleep(5 * (attempt + 1))
 
 
 def get_json(query: str):
