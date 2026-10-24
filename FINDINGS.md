@@ -68,3 +68,14 @@ ChiroVox recordings are CC BY-NC-ND 4.0: used locally and non-commercially, neve
 | **Perch 2.0, time-expanded 12x** | **81%** | **92%** | **53%** | **84%** |
 
 Site normalisation (subtracting each site's mean embedding) made unseen-site accuracy worse (37% to 26-30% on the buggy run), because sites differ in species mix, so the site mean carries species information. The fix for unseen sites is more sites per species, not normalisation.
+
+## Test 3: many sites, three countries (2026-10-24, night)
+
+**Data:** 319 ChiroVox recordings, 34 species recorded at 3 or more sites each, **66 sites** in Vietnam (166), Malaysia (142) and Indonesia (11). Sampled round-robin across sites (`tools/fetch_multisite.py`, files over 8 MB skipped, 1.2 GB cap). Same pipeline as Test 2 (time-expanded files read correctly).
+
+| Features | Species (34, chance 3%) | Genus | Species, unseen sites | Genus, unseen sites |
+|---|---|---|---|---|
+| Baseline spectrum | 63% | 68% | 47% | 53% |
+| **Perch 2.0, time-expanded 12x** | **78%** | **91%** | **62%** | **86%** |
+
+**Result:** with many sites per species, accuracy on sites the model never heard rose from 53% (18 testable species, 16 sites) to **62% (33 testable species, 66 sites)**, although the task is harder. The gap between seen and unseen sites shrank from 28 to 16 points. More recording sites is what makes the model field-ready, which is the case for researchers pooling recordings.
