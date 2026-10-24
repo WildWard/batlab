@@ -78,4 +78,25 @@ Site normalisation (subtracting each site's mean embedding) made unseen-site acc
 | Baseline spectrum | 63% | 68% | 47% | 53% |
 | **Perch 2.0, time-expanded 12x** | **78%** | **91%** | **62%** | **86%** |
 
-**Result:** with many sites per species, accuracy on sites the model never heard rose from 53% (18 testable species, 16 sites) to **62% (33 testable species, 66 sites)**, although the task is harder. The gap between seen and unseen sites shrank from 28 to 16 points. More recording sites is what makes the model field-ready, which is the case for researchers pooling recordings.
+95% confidence intervals (Wilson): species 73-82%, genus 87-94%, unseen-site species 56-67%, unseen-site genus 82-89%.
+
+The rise from 53% (Test 2) to 62% on unseen sites is suggestive but **not a fair comparison**: different species sets and datasets. The controlled test below is the real evidence.
+
+## Test 4: controlled, does site variety help? (`tools/site_curve.py`)
+
+18 species with recordings from 5 or more sites. Each repeat holds out one site per species as the test, then trains on recordings from k other sites, always using the **same number of training recordings (4 per species)**, so only site variety changes. 40 repeats.
+
+| Training sites | Accuracy on the held-out site (mean, 95% range over repeats) |
+|---|---|
+| 1 | 49% (29-67%) |
+| 2 | 58% (42-78%) |
+| 3 | 62% (46-79%) |
+| 4 | 65% (51-77%) |
+
+Paired on the same test, 4 sites vs 1: **+16 points (95% bootstrap CI +13 to +20), better in 90% of repeats.** Caveat: repeats share test sites, so the interval is somewhat optimistic; 18 species only.
+
+## Limits of all tests so far
+- **Coverage:** 34 of 390+ Southeast Asian species. Species the model never heard get forced into the nearest known one; open-set detection is not done yet.
+- **Recordings:** mostly hand-release or close-range library calls, cleaner than passive survey recordings.
+- **Sample size:** about ten recordings per species; per-species accuracy is very uncertain (roughly plus or minus 25 points).
+- **Next:** test on real passive survey nights with expert labels, from partners.
