@@ -100,3 +100,19 @@ Paired on the same test, 4 sites vs 1: **+16 points (95% bootstrap CI +13 to +20
 - **Recordings:** mostly hand-release or close-range library calls, cleaner than passive survey recordings.
 - **Sample size:** about ten recordings per species; per-species accuracy is very uncertain (roughly plus or minus 25 points).
 - **Next:** test on real passive survey nights with expert labels, from partners.
+
+
+## Test 5: can the model say "I don't know this species"? (`tools/open_set.py`) Negative result
+
+Leave-one-species-out on the 34-species multi-site set: train on every species but one, then score how unfamiliar each test recording looks. Known test recordings come from held-out sites.
+
+| Unfamiliarity score | AUROC (1.0 perfect, 0.5 chance) |
+|---|---|
+| 1 minus top classifier probability | 0.46 |
+| Distance to nearest species centroid (Perch embedding) | 0.54 |
+| Mean distance to 3 nearest training recordings | 0.52 |
+| Distance from each known species' measured call-frequency range | 0.51 |
+
+**None works.** A species the model never heard looks no more unusual than a known species recorded at a new site: site and device differences are as large as many species differences in this data. With 33 known species, their call-frequency ranges also cover almost the whole band, so frequency alone can't flag newcomers either.
+
+**What Listen does instead:** it says plainly that it only suggests species it knows, and it has a "Not in my library" button. Passes labelled that way become an "Unknown" class, so similar-sounding passes get routed there instead of forced into a wrong species (in a test, labelling one 42-pass group sent 22 more passes to Unknown). Proper open-set detection remains an open problem; more species and real survey data should help.
