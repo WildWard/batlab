@@ -211,3 +211,20 @@ Wrong answers drop from 36% (always naming a species) to **14%**. On Listen's 48
 | 80% | 49% | 85% |
 | 90% | 38% | 88% |
 | 95% | 29% | 92% |
+
+## Test 11: calibrating Listen's confidence (`tools/calibrate_listen.py`)
+
+Listen's own classifier (Perch + call parameters x3, C=0.05) rebuilt in batlab and scored at unseen sites (49 species, 5-fold by site, 3 shuffles, 1,756 answers):
+
+| Listen showed (raw) | Species: right | | Listen showed (raw) | Genus: right |
+|---|---|---|---|---|
+| 60% | 60% | | 61% | 69% |
+| 81% | 78% | | 82% | 87% |
+| 95% | 91% | | 96% | **97%** (half of all recordings) |
+
+Listen's classifier is much better calibrated than the batlab test model of Test 10, slightly overconfident only at the top for species. Training on 3 recordings per species instead made it underconfident.
+
+**On a real survey night it still ran high.** On Listen's 48-file test night (reference library of 21 species, about 3 calls each) shown 80% was right 62% of the time, shown 94% right 92%. Survey passes are messier than library recordings, and some test "truth" is file-level (other bats in the background), so this is partly label noise. Library-based calibration can't fix survey conditions, so Listen now:
+- applies the calibration only to **lower** a confidence, never to raise it;
+- says plainly in the app that confidence ran high on a real survey night;
+- **checks itself on each survey**: every time an expert labels a pass, it records whether its earlier suggestion was right, and shows "right for X of N passes" for that survey.
