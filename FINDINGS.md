@@ -195,3 +195,19 @@ Same 49-species set, recording-level, 5-fold grouped by site (585 test recording
 | Otherwise "unsure" | 18% | (no claim) |
 
 Wrong answers drop from 36% (always naming a species) to **14%**. On Listen's 48-file test night the same rule named 35 passes to genus, 77% right, where the species guess for those passes was right 46% of the time. Listen now does this ("probably *Hipposideros* (genus)").
+
+## Test 10: more sites from ChiroVox, and how far confidence can be trusted (2026-10-25, night)
+
+**More sites.** `tools/fetch_new_sites.py` added one recording from every site not yet covered for a species (118 recordings, mostly long files the earlier 8 MB limit skipped): 978 recordings, **106 sites**. Controlled comparison, the same old-set test recordings, 5-fold by site, 3 repeats: species at unseen sites **57.0% without the new-site recordings, 56.7% with them** (difference -0.3 points, 95% CI -1.4 to +0.8). No gain: the new recordings are spread across about 60 species, roughly two extra each, while Test 4's large gain came from going from 1 to 4 sites for the same species. More library recordings won't move accuracy much further; field survey data from partners is the next lever.
+
+**Wider region.** Adding 94 recordings from China, Taiwan, India and Bangladesh gives **122 species, 36 genera, 142 sites in seven countries** (1,072 recordings): 72% species and 87% genus. Lower than the 91-species set (78% / 90%) because the extra species mostly have one or two recordings, and a species with a single recording can never be right. The wider set matters for coverage, not accuracy.
+
+**Can it be 99% sure?** At unseen sites (49-species set), species calls made at 95%+ confidence cover 29% of recordings and are right **92%** of the time; genus calls at 99%+ confidence are right **87%**. The model is overconfident at sites it hasn't heard: its percentages should be read as rankings, not probabilities, until they are calibrated on field data. No honest test here supports "99% accurate".
+
+| Species called when confidence is at least | Share answered | Right |
+|---|---|---|
+| 50% | 80% | 72% |
+| 70% | 59% | 80% |
+| 80% | 49% | 85% |
+| 90% | 38% | 88% |
+| 95% | 29% | 92% |
