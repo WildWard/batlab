@@ -96,7 +96,7 @@ The rise from 53% (Test 2) to 62% on unseen sites is suggestive but **not a fair
 Paired on the same test, 4 sites vs 1: **+16 points (95% bootstrap CI +13 to +20), better in 90% of repeats.** Caveat: repeats share test sites, so the interval is somewhat optimistic; 18 species only.
 
 ## Limits of all tests so far
-- **Coverage:** 102 of 390+ Southeast Asian species as of Test 7. Species the model never heard get forced into the nearest known one; open-set detection is not done yet.
+- **Coverage:** 91 of 390+ Southeast Asian species as of Test 7 (corrected). Species the model never heard get forced into the nearest known one; open-set detection is not done yet.
 - **Recordings:** mostly hand-release or close-range library calls, cleaner than passive survey recordings.
 - **Sample size:** about ten recordings per species; per-species accuracy is very uncertain (roughly plus or minus 25 points).
 - **Next:** test on real passive survey nights with expert labels, from partners.
@@ -144,6 +144,8 @@ Brackets: 95% Wilson intervals. With 15 more species, a harder task, accuracy he
 Recording-level, 5-fold grouped by recording; 95% Wilson intervals. Species with a single recording can never be right (they are never in training), so they pull the score down: on the 83 species with 3 or more recordings it is **79% (76-81)**.
 
 Doubling the species from 49 to 102 cost about 6 points of species accuracy and nothing at genus level. Unseen-site numbers are reported on the 49-species set (Test 6), since species from one site can't be tested on a new site.
+
+**Correction (25 Oct 2026, evening):** the 102 "species" in Test 7 included 10 uncertain identifications ("cf." and "sp" labels such as *Rhinolophus cf. pusillus*, 33 recordings) and one species under two spellings (*Rhinolophus pearsoni* / *pearsonii*). With those removed and merged (`tools/clean_set.py`), the set is **91 confirmed species, 855 recordings, 85 sites: 78% species (95% CI 75-81) and 90% genus (87-91)**. The 49-species set behind Tests 6, 8 and 9 had no such labels and is unchanged. The fetcher now skips "cf.", "aff." and "sp" labels.
 
 ## Test 8: unknown species from measured calls (`tools/measure_set.py`, `tools/open_set_calls.py`) Partly positive
 

@@ -6,6 +6,7 @@ Usage: python tools/fetch_multisite.py [name] [per_species] [min_sites] [country
 """
 import json
 import random
+import re
 import sys
 import time
 from collections import defaultdict
@@ -35,7 +36,8 @@ def main(name="SEA", per_species=15, min_sites=3, countries=("Malaysia", "Vietna
     for c in countries:
         records += [r for r in get_json(f"getselectedlist=Country&value={c}")
                     if r["recording_type"] == "Real time" and r["samplerate"] in ("384", "500") and " " in r["taxonname"]
-                    and "/" not in r["taxonname"]]  # "A b/c" = uncertain ID, not usable as a label
+                    and "/" not in r["taxonname"]   # "A b/c" = uncertain ID, not usable as a label
+                    and not re.search(r"\b(cf|aff)\.|\bsp\.?$", r["taxonname"])]   # "cf."/"aff."/"sp": not confirmed
         time.sleep(1)
     site_of = lambda r: f"{r['country']}/{r['locality']}"
     sites = defaultdict(set)
