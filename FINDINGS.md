@@ -167,3 +167,29 @@ AUROC; 0.5 is chance. Perch scores higher here than in Test 5 (0.52), so part of
 **Meaning:** a horseshoe or leaf-nosed bat calling at a frequency that no species in the library uses can be flagged as "unusual, check this". That is how several cryptic Southeast Asian species were first noticed. A newcomer calling close to a known species can't be told apart this way.
 
 **Caveats:** the 5% split was chosen after looking at the results and covers only 8 species, so treat it as a hypothesis to confirm on new data. "Nearest other species" means nearest in our ChiroVox library, not in the real fauna of a site. FM bats (vesper, woolly, tube-nosed) still show nothing useful.
+
+## Test 9: what makes species ID more accurate at new sites? (`tools/accuracy_eval.py`, `tools/augment_windows.py`)
+
+Same 49-species set, recording-level, 5-fold grouped by site (585 test recordings).
+
+| Change | Species at unseen sites |
+|---|---|
+| Perch 2.0 + logistic regression (current) | 64% |
+| + measured call parameters (weight x1, x3, x10) | 63-64% |
+| Other classifiers: stronger/weaker regularisation, LDA | 64% |
+| SVM (RBF) / k-nearest neighbours | 59% / 56% |
+| Training on field-like copies too (fainter, high frequencies faded, noise at 6-20 dB SNR) | 64% |
+
+**Field-like test recordings** (the same degradation applied to the test set): 58.5% trained on clean calls, 59.0% with field-like copies in training. Simulated field conditions cost about 5 points; augmentation wins back half a point. Perch embeddings already tolerate noise well.
+
+**Conclusion: the model is limited by data, not by the classifier.** Nothing we changed on the same recordings moved unseen-site accuracy. The lever is what Test 4 showed: more sites per species, which only partners can provide.
+
+**What does help in practice: knowing when not to answer.**
+
+| Policy | Share of recordings | Right |
+|---|---|---|
+| Name the species only at 70%+ confidence | 59% | **80%** |
+| Otherwise name the genus, if it is at 70%+ | 23% | **94%** |
+| Otherwise "unsure" | 18% | (no claim) |
+
+Wrong answers drop from 36% (always naming a species) to **14%**. On Listen's 48-file test night the same rule named 35 passes to genus, 77% right, where the species guess for those passes was right 46% of the time. Listen now does this ("probably *Hipposideros* (genus)").
