@@ -34,7 +34,8 @@ def main(name="SEA", per_species=15, min_sites=3, countries=("Malaysia", "Vietna
     records = []
     for c in countries:
         records += [r for r in get_json(f"getselectedlist=Country&value={c}")
-                    if r["recording_type"] == "Real time" and r["samplerate"] in ("384", "500") and " " in r["taxonname"]]
+                    if r["recording_type"] == "Real time" and r["samplerate"] in ("384", "500") and " " in r["taxonname"]
+                    and "/" not in r["taxonname"]]  # "A b/c" = uncertain ID, not usable as a label
         time.sleep(1)
     site_of = lambda r: f"{r['country']}/{r['locality']}"
     sites = defaultdict(set)
@@ -62,8 +63,9 @@ def main(name="SEA", per_species=15, min_sites=3, countries=("Malaysia", "Vietna
                 if uid in have:
                     continue
                 fname = f"{uid}_{sp.replace(' ', '_')}.wav"
-                local = ROOT / "data" / "dataset" / "Malaysia" / fname
-                if local.exists():  # already downloaded for the Malaysia set, reuse it
+                local = next((p for p in (ROOT / "data" / "dataset" / d / fname for d in ("Malaysia", "SEA", "SEA_full"))
+                              if p.exists() and p.parent != out), ROOT / "data" / "dataset" / "Malaysia" / fname)
+                if local.exists() and local.parent != out:  # already downloaded for an earlier set, reuse it
                     (out / fname).write_bytes(local.read_bytes())
                     manifest.append({"uid": uid, "taxon": sp, "genus": rec["genus"], "country": rec["country"],
                                      "samplerate_khz": rec["samplerate"], "access": "CC BY-NC-ND 4.0",

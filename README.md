@@ -13,13 +13,16 @@ Most free bat-call AI was trained on European and North American bats. This repo
 | **Perch 2.0 embeddings + logistic regression** | same | **81% species / 92% genus** |
 | Perch 2.0, tested only on unseen recording sites | same, grouped by locality | 53% species / 84% genus |
 | **Perch 2.0, many sites** | 319 recordings, 34 species, 66 sites in Vietnam, Malaysia, Indonesia | **78% species (95% CI 73-82) / 91% genus (87-94); 62% (56-67) / 86% (82-89) on unseen sites** |
+| **Perch 2.0, 49 species** | 595 recordings, 85 sites, each species at 3+ sites | **83% species (80-86) / 90% genus (87-92); 63% (59-67) / 82% (79-85) on unseen sites** |
+| **Perch 2.0, 102 species** | 888 recordings, every usable ChiroVox species in Vietnam, Malaysia, Indonesia | **77% species (74-80) / 90% genus (87-91)** |
+| Controlled, repeated on 23 species with 5+ sites | 30 repeats | 1 site 49%, 4 sites 66%; 4 vs 1: +18 points (95% CI +14 to +22) |
 | Controlled: more training sites, same amount of data | 18 species with 5+ sites, one held-out site each, 40 repeats | 1 site 49%, 2 sites 58%, 3 sites 62%, 4 sites 65%; 4 vs 1 on the same test: +16 points (95% CI +13 to +20) |
 
 Scores are per recording (window predictions averaged), with cross-validation grouped by recording so no recording is used for both training and testing. Chance is 5% for species and 14% for genus.
 
 > **Correction, 24 Oct 2026:** 157 of the 237 recordings are stored in ChiroVox time-expanded (slowed 16x, saved at 24 kHz). The first version read them as real-time audio, which filtered most of their calls away. `prepare_windows.py` now uses the library's recorded sample rate. Every score went up; earlier numbers were 74% / 88% / 36%.
 
-**The honest headline:** the method learns Southeast Asian species from about ten examples each. Accuracy drops on sites it has never heard, and a controlled test shows that training on more sites, with the same amount of data, closes much of that gap. Scope matters: 34 of 390+ Southeast Asian species, mostly clean close-range library recordings, about ten per species, so these numbers are early evidence, not field accuracy. Field use needs survey recordings from many more sites and devices, and a way to flag species the model has never heard. Details and caveats are in [FINDINGS.md](FINDINGS.md).
+**The honest headline:** the method learns Southeast Asian species from about ten examples each. Accuracy drops on sites it has never heard, and a controlled test shows that training on more sites, with the same amount of data, closes much of that gap. Scope matters: 102 of 390+ Southeast Asian species, mostly clean close-range library recordings, about ten per species, so these numbers are early evidence, not field accuracy. Field use needs survey recordings from many more sites and devices, and a way to flag species the model has never heard. Details and caveats are in [FINDINGS.md](FINDINGS.md).
 
 ## How it works
 

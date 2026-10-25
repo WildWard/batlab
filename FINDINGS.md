@@ -96,7 +96,7 @@ The rise from 53% (Test 2) to 62% on unseen sites is suggestive but **not a fair
 Paired on the same test, 4 sites vs 1: **+16 points (95% bootstrap CI +13 to +20), better in 90% of repeats.** Caveat: repeats share test sites, so the interval is somewhat optimistic; 18 species only.
 
 ## Limits of all tests so far
-- **Coverage:** 34 of 390+ Southeast Asian species. Species the model never heard get forced into the nearest known one; open-set detection is not done yet.
+- **Coverage:** 102 of 390+ Southeast Asian species as of Test 7. Species the model never heard get forced into the nearest known one; open-set detection is not done yet.
 - **Recordings:** mostly hand-release or close-range library calls, cleaner than passive survey recordings.
 - **Sample size:** about ten recordings per species; per-species accuracy is very uncertain (roughly plus or minus 25 points).
 - **Next:** test on real passive survey nights with expert labels, from partners.
@@ -116,3 +116,31 @@ Leave-one-species-out on the 34-species multi-site set: train on every species b
 **None works.** A species the model never heard looks no more unusual than a known species recorded at a new site: site and device differences are as large as many species differences in this data. With 33 known species, their call-frequency ranges also cover almost the whole band, so frequency alone can't flag newcomers either.
 
 **What Listen does instead:** it says plainly that it only suggests species it knows, and it has a "Not in my library" button. Passes labelled that way become an "Unknown" class, so similar-sounding passes get routed there instead of forced into a wrong species (in a test, labelling one 42-pass group sent 22 more passes to Unknown). Proper open-set detection remains an open problem; more species and real survey data should help.
+
+## Test 6: 49 species, 85 sites, six countries searched (2026-10-25)
+
+**Data:** 595 ChiroVox recordings of 49 species, each recorded at 3 or more sites, **85 sites**. Countries searched: Malaysia, Vietnam, Indonesia, Cambodia, Thailand, Laos; only the first three had usable recordings. Same fetcher and pipeline as Test 3, no data cap (`fetch_multisite.py SEA_full 15 3 ...`). Some species have fewer than 15 recordings because ChiroVox holds fewer, some files are restricted or over 8 MB.
+
+| Features | Species (49, chance 2%) | Genus | Species, unseen sites | Genus, unseen sites |
+|---|---|---|---|---|
+| Baseline spectrum | 69% | 70% | 51% | 53% |
+| **Perch 2.0, time-expanded 12x** | **83% (80-86)** | **90% (87-92)** | **63% (59-67)** | **82% (79-85)** |
+
+Brackets: 95% Wilson intervals. With 15 more species, a harder task, accuracy held (unseen-site species 62% to 63%) or rose (species 78% to 83%). Genus on unseen sites dipped 86% to 82%, inside overlapping intervals.
+
+**Site variety (Test 4 repeated, 23 species with 5+ sites, 30 repeats):** 1 site 49%, 2 sites 59%, 3 sites 62%, 4 sites 66%. Paired, 4 vs 1: **+18 points (95% CI +14 to +22), better in 93% of repeats.** The result from Test 4 holds on a larger species set.
+
+**Open set (Test 5 repeated):** AUROC 0.50 (top probability), 0.52 (centroid), 0.51 (nearest neighbours). Still chance; more species did not help.
+
+## Test 7: every species ChiroVox has, 102 species (2026-10-25)
+
+**Data:** 888 recordings of **102 species in 28 genera**, 85 sites in Vietnam (534), Malaysia (305) and Indonesia (49): every species with usable real-time recordings, including those from only one or two sites (`fetch_multisite.py SEA_all 15 1 ...`). Uncertain IDs such as "Emballonura alecto/monticola" are skipped. 31 species have 15 recordings, 19 have only one or two.
+
+| Features | Species (102, chance 1%) | Genus (28) |
+|---|---|---|
+| Baseline spectrum | 60% (57-64) | 62% |
+| **Perch 2.0, time-expanded 12x** | **77% (74-80)** | **90% (87-91)** |
+
+Recording-level, 5-fold grouped by recording; 95% Wilson intervals. Species with a single recording can never be right (they are never in training), so they pull the score down: on the 83 species with 3 or more recordings it is **79% (76-81)**.
+
+Doubling the species from 49 to 102 cost about 6 points of species accuracy and nothing at genus level. Unseen-site numbers are reported on the 49-species set (Test 6), since species from one site can't be tested on a new site.
