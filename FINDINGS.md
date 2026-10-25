@@ -144,3 +144,26 @@ Brackets: 95% Wilson intervals. With 15 more species, a harder task, accuracy he
 Recording-level, 5-fold grouped by recording; 95% Wilson intervals. Species with a single recording can never be right (they are never in training), so they pull the score down: on the 83 species with 3 or more recordings it is **79% (76-81)**.
 
 Doubling the species from 49 to 102 cost about 6 points of species accuracy and nothing at genus level. Unseen-site numbers are reported on the 49-species set (Test 6), since species from one site can't be tested on a new site.
+
+## Test 8: unknown species from measured calls (`tools/measure_set.py`, `tools/open_set_calls.py`) Partly positive
+
+Every recording of the 49-species set measured with WildWard Listen's call code (595 of 595; median of the main bat's best calls). Measured characteristic frequencies match the literature, e.g. *Hipposideros cervinus* 119 kHz, *Rhinolophus affinis* 74 kHz, *Aselliscus stoliczkanus* 129 kHz, with tight spreads in horseshoe and leaf-nosed bats.
+
+**Protocol (stricter than Test 5 for "known"):** leave one species out; every known-species recording is scored against a library rebuilt **without its own site**. Score = distance to the nearest known species, in units of that species' spread.
+
+| Score | Constant-frequency bats (25 hidden in turn) | All species (46) |
+|---|---|---|
+| Characteristic frequency only | **0.65** | 0.57 |
+| Four call measurements | 0.62 | 0.61 |
+| Perch embedding, nearest species centroid | 0.62 | 0.61 |
+
+AUROC; 0.5 is chance. Perch scores higher here than in Test 5 (0.52), so part of the gain comes from the protocol (nearest species centroid, site-excluded references), not from the features.
+
+**The useful part: it depends on how distinct the newcomer's frequency is.** Hiding one constant-frequency species at a time (mean AUROC 0.66, 95% CI 0.58-0.73 over species):
+
+- **8 species calling at least 5% away from every other species in the library: mean AUROC 0.84** (e.g. *H. cineraceus* 0.94, *R. marshalli* 0.91, *R. microglobosus* 0.89, *H. coxi* 0.89)
+- 17 species within 5% of another species: 0.57, near chance (e.g. *R. affinis* 0.35, *H. griffini* 0.28)
+
+**Meaning:** a horseshoe or leaf-nosed bat calling at a frequency that no species in the library uses can be flagged as "unusual, check this". That is how several cryptic Southeast Asian species were first noticed. A newcomer calling close to a known species can't be told apart this way.
+
+**Caveats:** the 5% split was chosen after looking at the results and covers only 8 species, so treat it as a hypothesis to confirm on new data. "Nearest other species" means nearest in our ChiroVox library, not in the real fauna of a site. FM bats (vesper, woolly, tube-nosed) still show nothing useful.
