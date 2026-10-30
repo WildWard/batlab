@@ -19,7 +19,7 @@ EXPANSION = 12
 WIN = 160_000  # 5 s at 32 kHz after expansion = 0.417 s real time
 
 
-def load(path: Path, recorded_khz: str = "") -> np.ndarray:
+def load(path: Path, recorded_khz: str = "", highpass: int = 12_000) -> np.ndarray:
     x, sr = sf.read(path, dtype="float32", always_2d=True)
     x = x[:, 0]
     # Many ChiroVox files are stored time-expanded (e.g. a 384 kHz recording saved at 24 kHz,
@@ -29,7 +29,7 @@ def load(path: Path, recorded_khz: str = "") -> np.ndarray:
     if sr != SR:
         g = np.gcd(sr, SR)
         x = signal.resample_poly(x, SR // g, sr // g).astype(np.float32)
-    sos = signal.butter(6, 12_000, "highpass", fs=SR, output="sos")
+    sos = signal.butter(6, highpass, "highpass", fs=SR, output="sos")
     return signal.sosfilt(sos, x).astype(np.float32)
 
 

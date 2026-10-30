@@ -228,3 +228,27 @@ Listen's classifier is much better calibrated than the batlab test model of Test
 - applies the calibration only to **lower** a confidence, never to raise it;
 - says plainly in the app that confidence ran high on a real survey night;
 - **checks itself on each survey**: every time an expert labels a pass, it records whether its earlier suggestion was right, and shows "right for X of N passes" for that survey.
+
+## Test 12: can we tell bats talking from bats navigating? (2026-10-30, `tools/fetch_context.py`, `event_features.py`, `social_test.py`, `silence_control.py`, `social_paired.py`, `social_types.py`) Positive on a small set, negative for call types
+
+ChiroVox tags some recordings with a call type: 84 Distress, 2 Social, about 1,000 Search or Flying. "Talking" below means Distress plus Social. These are bats in the hand or in an enclosure, so this is distress, not everyday social life.
+
+**The trap.** Talking and sonar were mostly recorded on different devices; only the D1000X has both (29 talking, 251 sonar). Across all devices Perch scores AUROC 0.98 and background alone scores 0.97, on species the model never trained on. That is the microphone, not the bat. Inside the one device it still looks strong (Perch 0.90, call shape 0.95), but the background between calls alone scores **0.87**, so those numbers are inflated too and should not be quoted. The first "quiet window" control was no use: in these 2 s recordings the quietest windows still hold calls (median peak 61 dB above the noise floor in talking recordings, 42 in sonar). The working control splices only the gaps between calls, with 13 ms cut either side of anything loud.
+
+**The fair test.** Compare only inside groups of the same species, site, method and device, centre features within each group, and score each species with a model trained on the others. 27 recordings, 11 talking, 9 groups, 9 species. Score = share of talking-sonar pairs where talking scores higher, 0.5 is chance. p-values shuffle labels within groups, 300 times, so 0.003 is the smallest possible.
+
+| Features | Paired score | p |
+|---|---|---|
+| Call shape (duration, pitch turns, harmonicity, pitch) | **1.00** | 0.003 |
+| Perch 2.0 on the loudest windows | **0.95** | 0.003 |
+| Control: Perch on the gaps between calls | 0.58 | 0.42 |
+
+Calls separate the labels on unseen species; the background between them does not.
+
+**What differs**, talking vs sonar in the same group: median event about 5x longer (higher in 95% of pairs), more pitch reversals (92%), more harmonic (89%), lower peak frequency, about a third lower (lower in 89%), fewer events per second. Loudness does not explain it (median SNR higher in 58% of pairs, share of loud events 47%). This matches textbook descriptions of social calls, and spectrograms of all 9 groups show it plainly: tidy evenly spaced pulses against long harsh squawks and warbles.
+
+**Call types: negative.** 1,935 loud events of 8 ms or longer from all 82 talking recordings (41 species, 13 genera), clustered on shape, checked for structure against data with each principal component shuffled, and for prediction strength on species-disjoint halves. Only 2 clusters repeat across species (prediction strength 0.76; 3 or more fall to 0.51 and below), and the 2 are not two call types: one is a squawk group (about 133 ms, 30 kHz, harmonic), the other mostly long constant-frequency sonar leaking in (80% Hipposideros and Rhinolophus, confirmed by eye). The squawk group splits no further with confidence (0.62 at 2, under 0.5 above that), and its subgroups mix warbles with noise and sonar. Warbling contours are clearly visible by eye in some species, so this says shape features on this data can't separate them, not that bats have no call types. Perch on single events is untested.
+
+**What this does and doesn't show.** It shows a simple, explainable detector can tell distress calls from sonar on species it never saw, inside one setup. It shows nothing about meaning or language, and the difference is big enough for a person to see, so it isn't a hidden code.
+
+**Caveats:** 27 recordings and 9 species; one device and one recording team (Estók, Görföl, Vuong), three sites in Vietnam; 6 of 9 groups recorded on a single date; 23 of the 50 exact-match recordings (8 of 19 talking) dropped out for lack of clean gaps or loud events; all groups are from enclosures. Detector settings were tuned on this data, and it has never been run on passive survey nights, where talking is rare and false alarms are the real test. The spectrograms stay local (`results/`, not in the repo) because ChiroVox audio is CC BY-NC-ND.
