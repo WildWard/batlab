@@ -275,3 +275,25 @@ A first run used a random control and showed gaps of +7 to +15, but it removed 2
 **What this means.** Recording method changes the calls enough that a library missing a method loses up to 18 points on it, Free-flying bats, what real passive surveys record, scored 4%, but putting free-flying recordings back only lifted that to 6%, so the library mismatch doesn't explain all of it (28 recordings, possibly hard ones; Test 14 has many more). So reference calls need their recording conditions documented, and a tool should know them. WildWard Listen now records habitat, method, microphone height and a note per survey or detector, and writes them into every export; it doesn't use them for identification yet, because training calls with the same fields are needed first. ChiroVox already has the right fields: the ChiroVox paper (Table 1) defines microhabitat as habitat structure (open, semi-cluttered, cluttered). In a 45-record sample, microhabitat was filled in none and habitat in 18 (landscape terms like "Secondary Forest", "cave entrance"). This fits the literature: Surlykke & Moss 2000 and Parsons 1998 found confined or released bats make shorter, higher calls than free-flying ones, and the ChiroVox paper notes nearly 75% of its recordings come from closed spaces or hand-held bats.
 
 **Caveats:** free flight has only 28 test recordings, so its numbers are rough; methods partly go with recording teams, so some of the effect may be team habits (gain settings, distance to the bat) rather than the bat; B's answers repeat over 3 shuffles, about 200 distinct hand-release and 370 enclosure recordings; no habitat field (open/edge/clutter) could be tested, since ChiroVox rarely records it.
+
+## Test 14: Bulgaria to Hungary, a model trained in one country used in another (2026-11-06, `tools/fetch_europe.py`, `tools/cross_country.py`)
+
+First European test. ChiroVox has 333 Hungarian recordings (25 species, nearly all by Estók Péter on a Pettersson D500X, mostly free-flying bats) and 570 Bulgarian ones (24 species, three teams on M500, AudioMoth and Anabat Swift, all free-flying). Sample: up to 10 recordings per species and country, spread over sites; 197 Hungarian (25 species, 29 sites as 0.1 degree cells) and 177 Bulgarian (7 sites), 1.0 GB. Perch 2.0 + logistic regression, one answer per recording.
+
+| Setup | Species | Genus | Recordings |
+|---|---|---|---|
+| Train Bulgaria, test Hungary (19 shared species) | **38%** | 57% | 159 |
+| of which horseshoe bats (CF) | 70% | 100% | 20 |
+| of which FM / QCF bats | 33% | 51% | 139 |
+| Hungary only, unseen Hungarian sites (25 species) | 43% | 64% | 197 |
+| Hungary + Bulgaria, unseen Hungarian sites | **49%** | 65% | 197 |
+| same, 19 shared species: Hungary only vs + Bulgaria | 48% vs **55%** | 67% vs 67% | 159 |
+
+**What it shows.**
+- A foreign library alone is weak (38%), but **added to home data it helps**: +6 points overall, +7 on shared species, and answers given with 70%+ confidence were right 68% of the time instead of 59%. Shared reference libraries across countries are worth building.
+- **Call type decides how well it travels**, as the ChiroVox paper predicts: horseshoe bats (constant frequency) 70% species and 100% genus; FM and QCF bats 33%.
+- **Recording method again** (Test 13): the Bulgarian library is all free-flying, and Hungarian free-flying recordings scored 39%, hand release 29%, hand held 10% (106, 28 and 10 recordings).
+- Per species it ranges from 10/10 (*Pipistrellus pipistrellus*, *Rhinolophus hipposideros*) and 9/10 (*Hypsugo savii*) to 0 (*Barbastella*, *Plecotus auritus*, *Eptesicus serotinus*, *Myotis daubentonii*).
+- **Detector artifact:** all 20 Hungarian *Barbastella* were called *R. hipposideros*, and *R. hipposideros* also absorbed *Plecotus* and *Nyctalus* errors. In the Bulgarian set *R. hipposideros* is the one species recorded mostly on an Anabat Swift (8 of 10), so it likely became the "unfamiliar microphone" class. Not proven, but it matches Test 12's device warning: one species per device in a library teaches the model the device.
+
+**Caveats:** about 8 recordings per species per country; Hungary is essentially one recordist and one detector, so "unseen sites" there still share hands and microphone, and its 43% is if anything optimistic for other Hungarian teams; Bulgaria has only 7 sites; no confidence calibration or genus fallback applied here (Listen uses both).
