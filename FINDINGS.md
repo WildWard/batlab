@@ -252,3 +252,26 @@ Calls separate the labels on unseen species; the background between them does no
 **What this does and doesn't show.** It shows a simple, explainable detector can tell distress calls from sonar on species it never saw, inside one setup. It shows nothing about meaning or language, and the difference is big enough for a person to see, so it isn't a hidden code.
 
 **Caveats:** 27 recordings and 9 species; one device and one recording team (Estók, Görföl, Vuong), three sites in Vietnam; 6 of 9 groups recorded on a single date; 23 of the 50 exact-match recordings (8 of 19 talking) dropped out for lack of clean gaps or loud events; all groups are from enclosures. Detector settings were tuned on this data, and it has never been run on passive survey nights, where talking is rare and false alarms are the real test. The spectrograms stay local (`results/`, not in the repo) because ChiroVox audio is CC BY-NC-ND.
+
+## Test 13: does the recording method change what the classifier hears? (2026-11-06, `tools/method_eval.py`) Yes: a library missing a method costs 5 to 18 points
+
+ChiroVox notes how each call was recorded: hand release, hand held, enclosure (flight tent) or free flight. The ChiroVox team pointed out that the same bat calls differently depending on how and where it flies (open space, edge, clutter, in the hand), and that free ID tools ignore this. Set: SEA_wide_clean, 1,072 recordings, 142 sites, 122 species; 553 enclosure, 250 hand release, 177 hand held, 50 free flight. All scores at unseen sites (5-fold by locality), Perch 2.0 + logistic regression as in earlier tests.
+
+**A. Accuracy by how the test recording was made:** hand release 57% (217), hand held 50% (156), enclosure 44% (480), **free flight 4% (28)**. The library is almost all hand and enclosure recordings, and on bats flying free it barely works. Species mixes differ between methods, so A alone doesn't prove the method is the cause; B does that.
+
+**B. The cost of a method missing from the library.** For each test method, one model trains without any recordings of that method; the control model drops exactly as many recordings of each species, taken from that species' other methods. Same test recordings, 3 site shuffles:
+
+| Test method | Library without it | Control | Gap |
+|---|---|---|---|
+| hand release | 50% | 67% | **+18** |
+| enclosure | 43% | 55% | **+12** |
+| hand held | 51% | 55% | +5 |
+| free flight | 0% | 6% | +6 (tiny, 80 answers) |
+
+A first run used a random control and showed gaps of +7 to +15, but it removed 2 to 3 times fewer recordings of the test species (42% vs 17% for hand release), so it mixed the method effect with less data per species. With the matched control the gaps stay and the biggest grows. Where a species had too few recordings from other methods the control drops fewer, so these gaps are, if anything, slightly generous to the control.
+
+**C. Can the method be read from the sound alone?** Inside one device model (so the microphone can't explain it), unseen sites: M500-384 **89% vs 52%** by always guessing the commoner method (190 recordings, 68 sites); D1000X 74% vs 74% (no better, 3 unbalanced methods); M500 50% vs 63% (worse, 82 recordings). Clear on the one device with two balanced methods, absent on the others.
+
+**What this means.** Recording method changes the calls enough that a library missing a method loses up to 18 points on it, and a library of handled bats nearly fails on free-flying ones, which is what real passive surveys record. So reference calls need their recording conditions documented, and a tool should know them. WildWard Listen now records habitat, method, microphone height and a note per survey or detector, and writes them into every export; it doesn't use them for identification yet, because training calls with the same fields are needed first. ChiroVox has `rec_habitat` and `rec_microhabitat` fields: in a 45-record sample, habitat was filled in 18 (landscape terms like "Secondary Forest", "cave entrance", not flight situation) and microhabitat in none.
+
+**Caveats:** free flight has only 28 test recordings, so its numbers are rough; methods partly go with recording teams, so some of the effect may be team habits (gain settings, distance to the bat) rather than the bat; B's answers repeat over 3 shuffles, about 200 distinct hand-release and 370 enclosure recordings; no habitat field (open/edge/clutter) could be tested, since ChiroVox rarely records it.
