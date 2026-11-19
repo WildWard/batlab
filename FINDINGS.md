@@ -298,7 +298,7 @@ First European test. ChiroVox has 333 Hungarian recordings (25 species, nearly a
 
 **Caveats:** about 8 recordings per species per country; Hungary is essentially one recordist and one detector, so "unseen sites" there still share hands and microphone, and its 43% is if anything optimistic for other Hungarian teams; Bulgaria has only 7 sites; no confidence calibration or genus fallback applied here (Listen uses both).
 
-## Test 15: does it help to tell the classifier how a recording was made? (2026-11-19, `tools/context_eval.py`) Negative on the European set
+## Test 15: does it help to tell the classifier how a recording was made? (2026-11-19, `tools/context_eval.py`) Negative: no gain from the sound, under one point from the species mix
 
 Test 13 showed that the recording method changes the calls. The ChiroVox team's idea goes one step further: let the user enter the recording circumstances, and let the program use them. This test tries the simplest versions of that, with the method field ChiroVox already has (free flight, hand release, hand held, enclosure, other). Same Perch 2.0 + logistic regression as before, unseen sites (5-fold by locality, 3 site shuffles), one answer per recording.
 
@@ -318,8 +318,19 @@ Control for each: the same procedure with the method labels shuffled between rec
 | Weight | 50.5% | -0.6 (-1.4 to +0.1) | -0.8 (-1.9 to +0.2) |
 | Prior | 51.0% | -0.1 (-0.8 to +0.5) | +0.2 (-0.5 to +0.9) |
 
-**Nothing moved.** Every change is inside one point, every interval includes zero, and the shuffled labels do the same. By method: free flight 52% with or without (227 recordings); hand release 41% base, 35% centred (35 recordings, interval -15 to +2); enclosure fell from 42% to 22% when centred, but that is 15 recordings with a centre learned from about a dozen, so it shows the risk of the trick on a rare method more than anything else.
+**Nothing moved in Europe.** Every change is inside one point, every interval includes zero, and the shuffled labels do the same. By method: free flight 52% with or without (227 recordings); hand release 41% base, 35% centred (35 recordings, interval -15 to +2); enclosure fell from 42% to 22% when centred, but that is 15 recordings with a centre learned from about a dozen, so it shows the risk of the trick on a rare method more than anything else.
+
+**Southeast Asia (SEA_wide_clean), 983 recordings scored, 122 species, 142 sites** (513 enclosure, 237 hand release, 168 hand held, 37 other, 28 free flight). This set has far more variety in method than the European one:
+
+| Variant | Species right | Change vs base (95% CI) | Same with shuffled labels |
+|---|---|---|---|
+| Base (method not used) | 47.8% | | |
+| Centre | 48.1% | +0.2 (-0.7 to +1.1) | +0.1 (-0.5 to +0.7) |
+| Weight | 47.8% | -0.1 (-0.6 to +0.5) | +0.2 (-0.3 to +0.7) |
+| Prior | 48.7% | **+0.8 (+0.4 to +1.3)** | +0.2 (-0.3 to +0.7) |
+
+The two variants that use the method to treat the sound differently (centre, weight) do nothing here either. The prior gains 0.8 points, and its shuffled control does not, so that small gain is real. But it is the species mix: in this library some species were only ever recorded one way, and the model learns that. On a survey night every recording has the same method, so that gain would not carry over. Free-flying recordings stay at 5 to 8% whatever is done (28 recordings).
 
 **What this means.** Knowing the method does not help when it is bolted on to a library that was not built for it. Two thirds of this set is one method (free flight), methods go with recordists and detectors, and the method field says nothing about open space or clutter, which is what the idea is really about. So Test 13 and Test 15 together say: the method matters (a library missing one loses 5 to 18 points), but a label alone does not buy that back. It needs reference calls recorded on purpose in each condition, with the conditions written down the same way every time. That is what the conditions form in WildWard Listen is for, and it is why Listen still does not use the conditions for identification.
 
-**Caveats:** small set (about 8 recordings per species and country); only the recording method was tested, not habitat or clutter, because ChiroVox rarely has those filled in; only three simple linear ways were tried, a model trained with the conditions as an input from the start could behave differently; the 51% base here is a little higher than Test 14's 49% because both countries are in training and test here.
+**Caveats:** small set (about 8 recordings per species and country); only the recording method was tested, not habitat or clutter, because ChiroVox rarely has those filled in; only three simple linear ways were tried, a model trained with the conditions as an input from the start could behave differently; the Southeast Asian base is 48% here because this is the wider 122-species set (Test 10); the 51% European base is a little higher than Test 14's 49% because both countries are in training and test here.
