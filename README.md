@@ -17,6 +17,8 @@ Most free bat-call AI was trained on European and North American bats. This repo
 | **Perch 2.0, 91 species** | 855 recordings, every confirmed ChiroVox species in Vietnam, Malaysia, Indonesia | **78% species (75-81) / 90% genus (87-91)** |
 | Controlled, repeated on 23 species with 5+ sites | 30 repeats | 1 site 49%, 4 sites 66%; 4 vs 1: +18 points (95% CI +14 to +22) |
 | Talking (distress) vs sonar, unseen species, matched species, site, method and device | 27 recordings, 9 species, one device | Call shape 1.00, Perch 0.95, background between calls 0.58 (chance 0.5); small set, no reliable call types found, details in Test 12 |
+| Recording method (Test 13): library missing one method vs a species-matched control | 1,072 recordings, 122 species, 142 sites | Hand release -18 points, flight tent or enclosure -12, hand held -5 on calls recorded that way |
+| **Europe, first test (Test 14): Hungary and Bulgaria** | 374 ChiroVox recordings, 28 species; about 8 per species and country | Train Bulgaria, test Hungary: 38% species / 57% genus (horseshoe bats 70%, FM and QCF bats 33%). Unseen Hungarian sites: 43% with Hungarian calls, **49% with Bulgarian calls added**. Far too little data for a real tool |
 | Controlled: more training sites, same amount of data | 18 species with 5+ sites, one held-out site each, 40 repeats | 1 site 49%, 2 sites 58%, 3 sites 62%, 4 sites 65%; 4 vs 1 on the same test: +16 points (95% CI +13 to +20) |
 
 Scores are per recording (window predictions averaged), with cross-validation grouped by recording so no recording is used for both training and testing. Chance is 5% for species and 14% for genus.

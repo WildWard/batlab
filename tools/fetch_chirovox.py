@@ -12,7 +12,8 @@ import urllib.request
 from pathlib import Path
 
 BASE = "https://www.chirovox.org"
-UA = {"User-Agent": "Mozilla/5.0 (batlab research sample; contact via chirovox)"}
+# Say who we are: project name, where to read about it, where to write. 1 request per second (see sleep below).
+UA = {"User-Agent": "WildWard-batlab/0.1 (non-commercial research; +https://wildward.github.io; wildward.org@gmail.com)"}
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "chirovox"
 

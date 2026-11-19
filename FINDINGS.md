@@ -272,7 +272,7 @@ A first run used a random control and showed gaps of +7 to +15, but it removed 2
 
 **C. Can the method be read from the sound alone?** Inside one device model (so the microphone can't explain it), unseen sites: M500-384 **89% vs 52%** by always guessing the commoner method (190 recordings, 68 sites); D1000X 74% vs 74% (no better, 3 unbalanced methods); M500 50% vs 63% (worse, 82 recordings). Clear on the one device with two balanced methods, absent on the others.
 
-**What this means.** Recording method changes the calls enough that a library missing a method loses up to 18 points on it, Free-flying bats, what real passive surveys record, scored 4%, but putting free-flying recordings back only lifted that to 6%, so the library mismatch doesn't explain all of it (28 recordings, possibly hard ones; Test 14 has many more). So reference calls need their recording conditions documented, and a tool should know them. WildWard Listen now records habitat, method, microphone height and a note per survey or detector, and writes them into every export; it doesn't use them for identification yet, because training calls with the same fields are needed first. ChiroVox already has the right fields: the ChiroVox paper (Table 1) defines microhabitat as habitat structure (open, semi-cluttered, cluttered). In a 45-record sample, microhabitat was filled in none and habitat in 18 (landscape terms like "Secondary Forest", "cave entrance"). This fits the literature: Surlykke & Moss 2000 and Parsons 1998 found confined or released bats make shorter, higher calls than free-flying ones, and the ChiroVox paper notes nearly 75% of its recordings come from closed spaces or hand-held bats.
+**What this means.** Recording method changes the calls enough that a library missing a method loses up to 18 points on it. Free-flying bats, what real passive surveys record, scored 4%, but putting free-flying recordings back only lifted that to 6%, so the library mismatch doesn't explain all of it (28 recordings, possibly hard ones; Test 14 has many more). So reference calls need their recording conditions documented, and a tool should know them. WildWard Listen now records habitat, method, microphone height and a note per survey or detector, and writes them into every export; it doesn't use them for identification yet, because training calls with the same fields are needed first. ChiroVox already has the right fields: the ChiroVox paper (Table 1) defines microhabitat as habitat structure (open, semi-cluttered, cluttered). In a 45-record sample, microhabitat was filled in none and habitat in 18 (landscape terms like "Secondary Forest", "cave entrance"). This fits the literature: Surlykke & Moss 2000 and Parsons 1998 found confined or released bats make shorter, higher calls than free-flying ones, and the ChiroVox paper notes nearly 75% of its recordings come from closed spaces or hand-held bats.
 
 **Caveats:** free flight has only 28 test recordings, so its numbers are rough; methods partly go with recording teams, so some of the effect may be team habits (gain settings, distance to the bat) rather than the bat; B's answers repeat over 3 shuffles, about 200 distinct hand-release and 370 enclosure recordings; no habitat field (open/edge/clutter) could be tested, since ChiroVox rarely records it.
 
@@ -297,3 +297,29 @@ First European test. ChiroVox has 333 Hungarian recordings (25 species, nearly a
 - **Detector artifact:** all 20 Hungarian *Barbastella* were called *R. hipposideros*, and *R. hipposideros* also absorbed *Plecotus* and *Nyctalus* errors. In the Bulgarian set *R. hipposideros* is the one species recorded mostly on an Anabat Swift (8 of 10), so it likely became the "unfamiliar microphone" class. Not proven, but it matches Test 12's device warning: one species per device in a library teaches the model the device.
 
 **Caveats:** about 8 recordings per species per country; Hungary is essentially one recordist and one detector, so "unseen sites" there still share hands and microphone, and its 43% is if anything optimistic for other Hungarian teams; Bulgaria has only 7 sites; no confidence calibration or genus fallback applied here (Listen uses both).
+
+## Test 15: does it help to tell the classifier how a recording was made? (2026-11-19, `tools/context_eval.py`) Negative on the European set
+
+Test 13 showed that the recording method changes the calls. The ChiroVox team's idea goes one step further: let the user enter the recording circumstances, and let the program use them. This test tries the simplest versions of that, with the method field ChiroVox already has (free flight, hand release, hand held, enclosure, other). Same Perch 2.0 + logistic regression as before, unseen sites (5-fold by locality, 3 site shuffles), one answer per recording.
+
+Three ways to use the method:
+- **centre**: subtract the average embedding of the recording's method, learned on the training fold, so what all calls of one method share (room echo, distance, gain) is removed before classifying;
+- **weight**: when naming a recording of one method, reference calls of the same method count three times;
+- **prior**: the method is an extra input column. A linear model can only turn that into "which species are usual for this method", so this one measures the species mix, not the sound.
+
+Control for each: the same procedure with the method labels shuffled between recordings. A gain the shuffled labels also give is not about the method.
+
+**Europe (Hungary and Bulgaria), 339 recordings scored, 28 species, 36 sites** (227 free flight, 44 other, 35 hand release, 18 hand held, 15 enclosure):
+
+| Variant | Species right | Change vs base (95% CI) | Same with shuffled labels |
+|---|---|---|---|
+| Base (method not used) | 51.1% | | |
+| Centre | 50.3% | -0.8 (-2.9 to +1.3) | +0.1 (-1.1 to +1.3) |
+| Weight | 50.5% | -0.6 (-1.4 to +0.1) | -0.8 (-1.9 to +0.2) |
+| Prior | 51.0% | -0.1 (-0.8 to +0.5) | +0.2 (-0.5 to +0.9) |
+
+**Nothing moved.** Every change is inside one point, every interval includes zero, and the shuffled labels do the same. By method: free flight 52% with or without (227 recordings); hand release 41% base, 35% centred (35 recordings, interval -15 to +2); enclosure fell from 42% to 22% when centred, but that is 15 recordings with a centre learned from about a dozen, so it shows the risk of the trick on a rare method more than anything else.
+
+**What this means.** Knowing the method does not help when it is bolted on to a library that was not built for it. Two thirds of this set is one method (free flight), methods go with recordists and detectors, and the method field says nothing about open space or clutter, which is what the idea is really about. So Test 13 and Test 15 together say: the method matters (a library missing one loses 5 to 18 points), but a label alone does not buy that back. It needs reference calls recorded on purpose in each condition, with the conditions written down the same way every time. That is what the conditions form in WildWard Listen is for, and it is why Listen still does not use the conditions for identification.
+
+**Caveats:** small set (about 8 recordings per species and country); only the recording method was tested, not habitat or clutter, because ChiroVox rarely has those filled in; only three simple linear ways were tried, a model trained with the conditions as an input from the start could behave differently; the 51% base here is a little higher than Test 14's 49% because both countries are in training and test here.
