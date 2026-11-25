@@ -334,3 +334,93 @@ The two variants that use the method to treat the sound differently (centre, wei
 **What this means.** Knowing the method does not help when it is bolted on to a library that was not built for it. Two thirds of this set is one method (free flight), methods go with recordists and detectors, and the method field says nothing about open space or clutter, which is what the idea is really about. So Test 13 and Test 15 together say: the method matters (a library missing one loses 5 to 18 points), but a label alone does not buy that back. It needs reference calls recorded on purpose in each condition, with the conditions written down the same way every time. That is what the conditions form in WildWard Listen is for, and it is why Listen still does not use the conditions for identification.
 
 **Caveats:** small set (about 8 recordings per species and country); only the recording method was tested, not habitat or clutter, because ChiroVox rarely has those filled in; only three simple linear ways were tried, a model trained with the conditions as an input from the start could behave differently; the Southeast Asian base is 48% here because this is the wider 122-species set (Test 10); the 51% European base is a little higher than Test 14's 49% because both countries are in training and test here.
+
+## Test 16: which species hold up at a new site, and does "answer only when sure" help? (2026-11-25, `tools/per_species.py`)
+
+Asked by Smilla Emneryd on the WILDLABS thread: the overall drop at unseen sites (78% to about 63%) says little to someone with a new survey; what matters is which species fall, and whether the tool can tell when not to answer. Both were sitting in data already on disk.
+
+Set: the 49-species set of Test 6 (595 recordings, 85 sites). Unseen sites as before (5 folds grouped by site), repeated 5 times with the sites reshuffled, one answer per recording. 585 recordings of 47 species could be scored (the species must also be in the training fold), 2,932 answers in all. Two models on the same splits:
+- **Perch test model** (the one behind the published 63%): 65% species, 86% genus here. A little above the published figure because the folds are cut on recordings here and on windows there.
+- **Listen's own classifier** as rebuilt in Test 11 (Perch plus measured call parameters): 63% species, 86% genus. This is what a user of the app gets, so the table below is this one. The Perch test model gives the same picture (`results/per_species_SEA_full.json` has both).
+
+**Per species, Listen's classifier, unseen sites.** "When sure" means a shown confidence of 0.63 or more, the level at which it answers half of all recordings.
+
+| Species | Recordings | Species right | Genus right | When sure: answers | When sure: right | Mostly mistaken for |
+|---|---|---|---|---|---|---|
+| *Glischropus tylopus* | 8 | 2% | 2% | 20% | 12% | *Myotis muricola* |
+| *Tylonycteris pachypus* | 6 | 7% | 0% | 23% | 0% | *Myotis ridleyi* |
+| *Kerivoula hardwickii* | 14 | 7% | 86% | 13% | 0% | *Kerivoula papillosa* |
+| *Pipistrellus javanicus* | 15 | 32% | 39% | 49% | 35% | *Scotophilus heathii* |
+| *Kerivoula pellucida* | 15 | 33% | 93% | 7% | 80% | *Kerivoula hardwickii* |
+| *Hipposideros coxi* | 14 | 34% | 73% | 29% | 75% | *Hipposideros diadema* |
+| *Hipposideros kunzi* | 7 | 39% | 100% | 32% | 44% | *Hipposideros gentilis* |
+| *Miniopterus australis* | 15 | 40% | 79% | 11% | 62% | *Miniopterus pusillus* |
+| *Murina cyclotis* | 15 | 40% | 87% | 32% | 54% | *Murina annamitica* |
+| *Hipposideros cervinus* | 15 | 43% | 99% | 25% | 84% | *Hipposideros galeritus* |
+| *Pipistrellus coromandra* | 13 | 46% | 51% | 25% | 62% | *Glischropus tylopus* |
+| *Hipposideros galeritus* | 15 | 49% | 100% | 55% | 51% | *Hipposideros cervinus* |
+| *Miniopterus magnater* | 2 | 50% | 50% | 40% | 0% | *Pipistrellus javanicus* |
+| *Myotis muricola* | 15 | 51% | 77% | 43% | 56% | *Myotis ridleyi* |
+| *Hipposideros bicolor* | 15 | 53% | 93% | 37% | 54% | *Hipposideros kunzi* |
+| *Miniopterus pusillus* | 5 | 55% | 100% | 80% | 56% | *Miniopterus australis* |
+| *Aselliscus stoliczkanus* | 15 | 56% | 36% | 32% | 62% | *Hipposideros cineraceus* |
+| *Rhinolophus thomasi* | 15 | 57% | 96% | 36% | 96% | *Rhinolophus affinis* |
+| *Murina feae* | 10 | 58% | 86% | 34% | 65% | *Murina cyclotis* |
+| *Rhinolophus borneensis* | 15 | 59% | 80% | 67% | 82% | *Hipposideros cervinus* |
+| *Rhinolophus pusillus* | 15 | 59% | 93% | 73% | 65% | *Rhinolophus lepidus* |
+| *Hipposideros diadema* | 15 | 64% | 93% | 49% | 73% | *Hipposideros armiger* |
+| *Hipposideros larvatus* | 15 | 64% | 99% | 65% | 71% | *Hipposideros galeritus* |
+| *Kerivoula papillosa* | 15 | 64% | 85% | 40% | 90% | *Kerivoula hardwickii* |
+| *Myotis ridleyi* | 5 | 64% | 100% | 8% | 50% | *Myotis muricola* |
+| *Rhinolophus affinis* | 15 | 67% | 100% | 35% | 96% | *Rhinolophus creaghi* |
+| *Rhinolophus rex* | 9 | 67% | 100% | 56% | 80% | *Rhinolophus philippinensis* |
+| *Murina annamitica* | 13 | 68% | 92% | 42% | 85% | *Kerivoula papillosa* |
+| *Hipposideros cineraceus* | 15 | 69% | 100% | 39% | 100% | *Aselliscus stoliczkanus* |
+| *Hipposideros gentilis* | 15 | 71% | 83% | 53% | 78% | *Aselliscus stoliczkanus* |
+| *Hipposideros dyacorum* | 15 | 72% | 87% | 55% | 100% | *Kerivoula pellucida* |
+| *Scotophilus kuhlii* | 15 | 73% | 87% | 80% | 80% | *Scotophilus heathii* |
+| *Hipposideros armiger* | 15 | 75% | 100% | 53% | 88% | *Hipposideros diadema* |
+| *Rhinolophus siamensis* | 8 | 75% | 100% | 28% | 100% | *Rhinolophus creaghi* |
+| *Myotis alticraniatus* | 9 | 78% | 80% | 38% | 100% | *Kerivoula hardwickii* |
+| *Rhinolophus chaseni* | 6 | 83% | 100% | 50% | 100% | *Rhinolophus borneensis* |
+| *Myotis horsfieldii* | 15 | 84% | 88% | 76% | 98% | *Tylonycteris pachypus* |
+| *Rhinolophus philippinensis* | 15 | 87% | 100% | 76% | 82% | *Rhinolophus rex* |
+| *Scotophilus heathii* | 15 | 87% | 88% | 73% | 98% | *Pipistrellus javanicus* |
+| *Megaderma spasma* | 9 | 89% | 89% | 78% | 100% | *Miniopterus australis* |
+| *Harpiocephalus harpia* | 12 | 90% | 90% | 57% | 100% | *Myotis muricola* |
+| *Rhinolophus microglobosus* | 12 | 92% | 98% | 68% | 100% | *Hipposideros cineraceus* |
+| *Rhinolophus creaghi* | 15 | 92% | 100% | 55% | 100% | *Rhinolophus affinis* |
+| *Rhinolophus pearsonii* | 15 | 92% | 93% | 85% | 100% | *Hipposideros cineraceus* |
+| *Hipposideros griffini* | 15 | 99% | 100% | 97% | 100% | *Hipposideros armiger* |
+| *Rhinolophus malayanus* | 15 | 100% | 100% | 93% | 100% |  |
+| *Rhinolophus marshalli* | 8 | 100% | 100% | 93% | 100% |  |
+
+Of the 41 species with 8 or more recordings: 11 are right 80% of the time or more, 20 between 50 and 80%, 10 below 50%.
+
+- **Three are almost never right:** *Glischropus tylopus*, *Tylonycteris pachypus* and *Kerivoula hardwickii* (2 to 7%). The first two also get the wrong genus (they go to *Myotis*); *K. hardwickii* goes to *K. papillosa*, so at least the genus holds (86%).
+- **Mostly it is pairs inside one genus that swap:** *Hipposideros galeritus* and *H. cervinus*, *Miniopterus australis* and *M. pusillus*, the three *Kerivoula*, *Murina cyclotis* and *M. annamitica*. That is why the genus is right for 80% or more in 34 of the 41 species. Genus below 50% only for *Glischropus tylopus*, *Pipistrellus javanicus* and *Aselliscus stoliczkanus* (which goes to *Hipposideros*, its own family).
+- **Constant-frequency callers travel best, as in Test 14:** *Rhinolophus* averages 79%, *Hipposideros* 63%, all other genera 55%.
+
+**Answer only when sure (risk-coverage).** Recordings sorted by shown confidence, most confident first; the tool answers only the top share.
+
+| Share answered | Listen: species right | from confidence | Listen: genus right | from confidence | Perch model: species | Perch model: genus |
+|---|---|---|---|---|---|---|
+| 100% | 63% | 0.08 | 86% | 0.22 | 65% | 86% |
+| 90% | 68% | 0.30 | 89% | 0.48 | 69% | 90% |
+| 80% | 71% | 0.39 | 93% | 0.61 | 73% | 93% |
+| 70% | 74% | 0.47 | 95% | 0.76 | 77% | 95% |
+| 60% | 78% | 0.55 | 96% | 0.85 | 79% | 96% |
+| 50% | 82% | 0.63 | 98% | 0.90 | 81% | 97% |
+| 40% | 86% | 0.73 | 99% | 0.94 | 85% | 98% |
+| 30% | 89% | 0.82 | 99% | 0.96 | 88% | 99% |
+| 20% | 93% | 0.88 | 98% | 0.98 | 89% | 98% |
+
+![Risk-coverage curves](figures/risk_coverage_SEA_full.png)
+
+So the confidence carries real information at new sites: answering half the recordings lifts Listen's species answers from 63% to 82% and genus from 86% to 98%, and its most confident fifth is right 93% of the time.
+
+**But the cutoff does not protect every species.** It helps on average, and it mostly silences the three hopeless species (they are answered for 13 to 23% of their recordings), but the few answers that get through for them are still wrong. And some species stay confidently wrong: *Pipistrellus javanicus* is still answered half the time and right 35% of that; *Hipposideros galeritus* is answered 55% of the time and right 51%; *Rhinolophus pusillus* 73% and 65%. A threshold alone would let those through. A user needs both things: a confidence cutoff, and a per-species list of "check these by hand whatever the tool says".
+
+**What this means for Listen.** Listen already shows a calibrated confidence, falls back to the genus, and counts on each survey how often its suggestions were right (Test 11). It does not have a per-species warning. This test says that would be worth having, built from exactly this kind of table for the user's own reference library.
+
+**Caveats:** at most 15 recordings per species, so a single species' figure is rough (about plus or minus 25 points) and the order in the middle of the table means little; the five repeats reuse the same recordings, so the 2,932 answers are not independent; these are clean library recordings, and on the one real survey night the confidence ran high (Test 11), so the confidence levels in the curve will not carry over as they are; and none of this helps with a species the library does not hold at all, which still gets a known species' name (Tests 5 and 8).
